@@ -2,7 +2,7 @@
     "crons": [
       {
         "path": "/api/cron/send-alerts",
-        "schedule": "26 10 * * *"
+        "schedule": "28 10 * * *"
       }
     ]
   }
