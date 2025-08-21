@@ -44,6 +44,7 @@ module.exports = async (req, res) => {
       message += `🔴 *${overdueCount} equipamento(s) atrasado(s)*\n`;
       message += `🟡 *${warningCount} equipamento(s) em aviso*\n\n`;
 
+      const responsibleSections = [];
       const groupedAlerts = alerts.reduce((acc, item) => {
         const responsible = item.responsible;
         if (!acc[responsible]) {
@@ -53,12 +54,22 @@ module.exports = async (req, res) => {
         return acc;
       }, {});
 
-      const responsibleSections = [];
       for (const responsible in groupedAlerts) {
         const items = groupedAlerts[responsible].map(item => {
           const status = getEquipmentStatus(item);
           const days = getDaysUntilNextCleaning(item);
-          const daysText = days < 0 ? `Atrasado em ${Math.abs(days)} dias` : `Falta 1 dia`;
+          
+          let daysText;
+          if (days < 0) {
+            daysText = `Atrasado em ${Math.abs(days)} dias`;
+          } else if (days === 0) {
+            daysText = `Precisa ser limpo hoje`;
+          } else if (days === 1) {
+            daysText = `Falta 1 dia`;
+          } else {
+            daysText = `Faltam ${days} dias`;
+          }
+
           const emoji = status === 'overdue' ? '🔴' : '🟡';
           
           return `${emoji} *${item.name}* (${item.sector})
@@ -69,7 +80,7 @@ module.exports = async (req, res) => {
         });
         responsibleSections.push(items.join('\n\n'));
       }
-
+      
       message += responsibleSections.join('\n\n');
       
       message += `\n\n[Acesse o painel web para mais detalhes](${PROJECT_URL})`;
