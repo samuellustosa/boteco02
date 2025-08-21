@@ -16,10 +16,7 @@ const getDaysUntilNextCleaning = (equipment) => {
 
 const getEquipmentStatus = (equipment) => {
   const daysUntil = getDaysUntilNextCleaning(equipment);
-  if (daysUntil < 0) {
-    return 'overdue';
-  }
-  if (daysUntil === 0) {
+  if (daysUntil <= 0) {
     return 'overdue';
   }
   if (daysUntil === 1) {
